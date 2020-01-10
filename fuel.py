@@ -16,7 +16,7 @@ FUEL with fuel cost data for each year/6months (resampled)
 
 
 
-import pandas as pd
+
 # import requests
 # from bs4 import BeautifulSoup
 #
@@ -26,28 +26,31 @@ import pandas as pd
 # # soup = soup.find('div', class_="BNeawe s3v9rd AP7Wnd")
 # # print(soup)
 
-
+import pandas as pd
+import matplotlib.pyplot as plt
 
 
 fuel = pd.read_csv('https://assets.datacamp.com/production/repositories/516/datasets/2f3d8b2156d5669fb7e12137f1c2e979c3c9ce0b/automobiles.csv', index_col='yr', parse_dates=True)
 prices = pd.read_csv('GASREGCOVW.csv', index_col=0, parse_dates=True)
 cars = fuel.loc[:,['name', 'origin']].set_index('name')
 spec = fuel.loc[:,['name', 'hp', 'accel', 'displ', 'mpg', 'weight']].set_index('name')
-prices = prices.rename(columns={'GASREGCOVW':'price'}, errors='raise')
+prices = prices.rename(columns={'GASREGCOVW':'price_gallon'}, errors='raise')
+
+#resampling data by 6 months
+prices = prices.resample('6M').mean()
 prices['region'] = 'US'
-prices = prices.resample('A').mean()
 print(prices.head())
-print(prices.columns)
 
 
-#cost = price.loc[:,['']]
-
-#print(fuel.head())
-#prices.resample('A').mean()
-#print(prices.head())
 
 
-#Change the colnames: https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.rename.html
-
+# #how the fuel price changed
+# prices['price_gallon'].plot()
+# #cust
+# plt.title('Fuel price change')
+# plt.xlabel('Date')
+# plt.ylabel('Price for gallon')
+# #displ
+# plt.show()
 
 
