@@ -42,8 +42,7 @@ prices = prices.rename(columns={'GASREGCOVW':'price_gallon'}, errors='raise')
 prices = prices.resample('6M').mean()
 prices['region'] = 'US'
 
-print(prices.head())
-print(prices.columns)
+print(cars.head())
 
 # #how the fuel price changed
 # prices['price_gallon'].plot()

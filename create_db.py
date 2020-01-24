@@ -3,7 +3,6 @@ import sqlite3
 conn = sqlite3.connect('database.db')
 c = conn.cursor()
 
-
 #importing and preparing data to be inserted
 import pandas as pd
 
@@ -50,18 +49,35 @@ prices['region'] = 'US'
 # print(cars.head())
 
 #def insert_to_db()
-for row in cars.values:
-    #c.execute('INSERT INTO cars VALUES(:mark_model, :origin)', {'mark_model':cars['name'][row], 'origin':cars['origin'][row]})
-    c.execute('INSERT INTO cars VALUES(?, ?)', (row[0], row[1]))
+# for row in cars.values:
+#     #c.execute('INSERT INTO cars VALUES(:mark_model, :origin)', {'mark_model':cars['name'][row], 'origin':cars['origin'][row]})
+#     c.execute('INSERT INTO cars VALUES(?, ?)', (row[0], row[1]))
+#
+# for row in
+#
+# conn.commit()
+#
+# rs = c.execute('SELECT * FROM cars')
+# conn.commit()
+
+spec = spec.drop_duplicates()
+
+# cars = pd.DataFrame(rs.fetchall())
+for row in spec.values:
+    c.execute('INSERT INTO spec VALUES(:hp, :accel, :displ, :mpg, :weight)', {'hp':row[0], 'accel':row[1], 'displ':row[2], 'mpg':row[3], 'weight':row[4]})
 
 conn.commit()
-
-c.execute('SELECT * FROM cars')
-conn.commit()
-
-cz_data = c.fetchall()
-print(cz_data)
-
+rs = c.execute('SELECT * FROM spec')
+specs = pd.DataFrame(rs.fetchall())
+print(specs.head())
 
 conn.close()
+
+# spec(
+#         car_name text PRIMARY KEY,
+#         hp integer,
+#         displ numeric(4,2),
+#         mpg numeric(3,2),
+#         weight numeric(4,2)
+
 
