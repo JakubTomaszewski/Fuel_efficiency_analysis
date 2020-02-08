@@ -33,48 +33,31 @@ class Server():
         self.conn.commit()
 
 
-# conn = sqlite3.connect('database.db')
-# c = conn.cursor()
-'''
-create tables in a db
-+CARS with car models and their origin
-+SPEC with the cars specification data (foreign key the 'name' with the cars table)
-PRICES with fuel cost data for each year/6months (resampled)
-'''
-
 db = Server('database.db')
 
-# #creating tables
-# db.execute('''CREATE TABLE Cars(
+# tables
+#             Cars(
 #             mark_model text PRIMARY KEY,
 #             origin char(2)
-#             );''')
+#             )
 
-# db.execute('''CREATE TABLE Spec(
+#             Spec(
 #             hp integer,
 #             accel_time numeric,
 #             range numeric,
 #             mpg numeric,
-#             weight integer);''')
-#
-# db.execute('''CREATE TABLE Prices(
+#             weight integer
+#             )
+
+#             Prices(
 #             date date,
 #             price_gallon float,
 #             region char(2)
-#             );''')
-#
-# db.commit()
+#             )
+
 
 #inserting data into db
 [(db.execute('INSERT INTO Cars VALUES (?, ?)', (cars.index[i], cars.iloc[i, 0]))) for i in range(len(cars))]
-
 prices.to_sql(name='Prices', con=db.conn)
-
 spec.to_sql(name='Spec', con=db.conn)
-
-
-
-# db.execute('SELECT * FROM Prices WHERE region = "US"')
-
-#transform it to a df using pd.read_sql_query()
-#drop all values where origin is not US
+db.commit()

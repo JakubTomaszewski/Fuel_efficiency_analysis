@@ -38,4 +38,5 @@ from sklearn.linear_model import Lasso
 # #displ
 # plt.show()
 
-
+#transform it to a df using pd.read_sql_query()
+#drop all values where origin is not US or select all values where the origin is equal to 'US'
