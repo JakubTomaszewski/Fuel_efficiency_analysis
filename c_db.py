@@ -12,33 +12,82 @@ prices = prices.rename(columns={'GASREGCOVW':'price_gallon'}, errors='raise')
 
 #resampling data by 6 months
 prices = prices.resample('6M').mean()
+
+#adding a new category col with region
 prices['region'] = 'US'
+prices['region'] = prices['region'].astype('category')
 
 
 #creating db and a connection
 import sqlite3
 
-conn = sqlite3.connect('database.db')
-c = conn.cursor()
+class Server():
+    def __init__(self, path): #connecting to a db and creating a cursor
+        self.conn = sqlite3.connect(path)
+        self.c = self.conn.cursor()
+
+    def execute(self, command, values=None):
+        self.c.execute(command, values)
+
+    def commit(self):
+        self.conn.commit()
+
+
+# conn = sqlite3.connect('database.db')
+# c = conn.cursor()
 '''
 create tables in a db
-CARS with car models and their origin
-SPEC with the cars specification data (foreign key the 'name' with the cars table)
-FUEL with fuel cost data for each year/6months (resampled)
++CARS with car models and their origin
++SPEC with the cars specification data (foreign key the 'name' with the cars table)
+PRICES with fuel cost data for each year/6months (resampled)
 '''
 
-c.execute('''CREATE TABLE Cars(
-            mark_model text PRIMARY KEY,
-            origin char(2)
-            );''')
+db = Server('database.db')
+
+# #creating tables
+# db.execute('''CREATE TABLE Cars(
+#             mark_model text PRIMARY KEY,
+#             origin char(2)
+#             );''')
+
+# db.execute('''CREATE TABLE Spec(
+#             hp integer,
+#             accel_time numeric,
+#             range numeric,
+#             mpg numeric,
+#             weight integer);''')
+#
+# db.execute('''CREATE TABLE Prices(
+#             date date,
+#             price_gallon float,
+#             region char(2)
+#             );''')
+#
+# db.commit()
+
+#inserting data into db
+[(db.execute('INSERT INTO Cars VALUES (?, ?)', (cars.index[i], cars.iloc[i, 0]))) for i in range(len(cars))]
+
+prices.to_sql(name='Prices', con=db.conn)
+
+spec.to_sql(name='Spec', con=db.conn)
+
+# db.execute('SELECT * FROM Cars')
+# res = db.c.fetchall()
+# print(res)
+# [print(row) for row in res]
 
 
-# conn.commit()
-#create spec db
-c.execute('''CREATE TABLE spec
-            hp real
-            accel real
-            distance real
+# print(cars.head())
+# cz = pd.read_sql_query('SELECT * FROM Cars', db.conn)
+# print(cz.head())
 
 
-            ''')
+
+
+
+# db.execute('SELECT * FROM Prices WHERE region = "US"')
+# res = db.c.fetchall()
+# [print(row) for row in res]
+#transform it to a df using pd.read_sql_query()
+#drop all values where origin is not US
