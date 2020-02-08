@@ -14,9 +14,6 @@ FUEL with fuel cost data for each year/6months (resampled)
 '''
 
 
-
-
-
 # import requests
 # from bs4 import BeautifulSoup
 #
@@ -29,20 +26,8 @@ FUEL with fuel cost data for each year/6months (resampled)
 import matplotlib.pyplot as plt
 import pandas as pd
 
-
-
-fuel = pd.read_csv('https://assets.datacamp.com/production/repositories/516/datasets/2f3d8b2156d5669fb7e12137f1c2e979c3c9ce0b/automobiles.csv', index_col='yr', parse_dates=True)
-prices = pd.read_csv('GASREGCOVW.csv', index_col=0, parse_dates=True)
-cars = fuel.loc[:,['name', 'origin']].set_index('name')
-spec = fuel.loc[:,['name', 'hp', 'accel', 'displ', 'mpg', 'weight']].set_index('name')
-prices = prices.rename(columns={'GASREGCOVW':'price_gallon'}, errors='raise')
-
-
-#resampling data by 6 months
-prices = prices.resample('6M').mean()
-prices['region'] = 'US'
-
-print(cars.head())
+from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import Lasso
 
 # #how the fuel price changed
 # prices['price_gallon'].plot()

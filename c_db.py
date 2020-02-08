@@ -72,22 +72,9 @@ prices.to_sql(name='Prices', con=db.conn)
 
 spec.to_sql(name='Spec', con=db.conn)
 
-# db.execute('SELECT * FROM Cars')
-# res = db.c.fetchall()
-# print(res)
-# [print(row) for row in res]
-
-
-# print(cars.head())
-# cz = pd.read_sql_query('SELECT * FROM Cars', db.conn)
-# print(cz.head())
-
-
-
 
 
 # db.execute('SELECT * FROM Prices WHERE region = "US"')
-# res = db.c.fetchall()
-# [print(row) for row in res]
+
 #transform it to a df using pd.read_sql_query()
 #drop all values where origin is not US
