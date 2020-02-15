@@ -36,16 +36,24 @@ class Server():
         self.conn.close()
 
 
+<<<<<<< HEAD
 
 db = Server('database.db')
 
 
 # #creating tables
 # db.execute('''CREATE TABLE Cars(
+=======
+db = Server('database.db')
+
+# tables
+#             Cars(
+>>>>>>> c5d17603b80cc012d6615bfb4935de4640ab082f
 #             mark_model text PRIMARY KEY,
 #             origin char(2)
-#             );''')
+#             )
 
+<<<<<<< HEAD
 
 # db.commit()
 
@@ -82,3 +90,25 @@ db.commit()
 
 #transform it to a df using pd.read_sql_query()
 #drop all values where origin is not US
+=======
+#             Spec(
+#             hp integer,
+#             accel_time numeric,
+#             range numeric,
+#             mpg numeric,
+#             weight integer
+#             )
+
+#             Prices(
+#             date date,
+#             price_gallon float,
+#             region char(2)
+#             )
+
+
+#inserting data into db
+[(db.execute('INSERT INTO Cars VALUES (?, ?)', (cars.index[i], cars.iloc[i, 0]))) for i in range(len(cars))]
+prices.to_sql(name='Prices', con=db.conn)
+spec.to_sql(name='Spec', con=db.conn)
+db.commit()
+>>>>>>> c5d17603b80cc012d6615bfb4935de4640ab082f
