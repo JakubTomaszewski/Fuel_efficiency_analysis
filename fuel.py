@@ -5,7 +5,6 @@ SPEC with the cars specification data (foreign key the 'name' with the cars tabl
 FUEL with fuel cost data for each year/6months (resampled)
 
 
-
 -compute the average cost of 100 miles for each car - need to calculate first it from gallons
 
 -get the average mileage from the web and compute which car is the most economic(which yearly cost is the smallest)
@@ -25,6 +24,15 @@ FUEL with fuel cost data for each year/6months (resampled)
 
 import matplotlib.pyplot as plt
 import pandas as pd
+
+
+
+
+
+
+
+
+
 
 from sklearn.linear_model import LinearRegression
 from sklearn.linear_model import Lasso

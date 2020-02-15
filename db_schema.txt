@@ -1,0 +1,17 @@
+TABLES: 
+Cars
+    mark_model text PRIMARY KEY,
+    origin char(2)
+
+Prices
+    mark_model text PRIMARY KEY
+    hp integer,
+    accel_time numeric,
+    range numeric,
+    mpg numeric,
+    weight integer);''')
+
+Spec
+    date date,
+    price_gallon float,
+    region char(2)
