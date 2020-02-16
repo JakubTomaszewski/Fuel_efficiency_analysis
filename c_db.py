@@ -64,7 +64,7 @@ db.commit()
 [(db.conn.execute('INSERT INTO Cars VALUES (?, ?)', (cars.index[i], cars.iloc[i, 0]))) for i in range(len(cars))]
 # [(db.conn.execute('INSERT INTO Spec VALUES (?, ?, ?, ?, ?)', (spec.index[i], spec.iloc[i, 0], spec.iloc[i, 1], spec.iloc[i, 2], spec.iloc[i, 3]))) for i in range(len(spec))]
 
-spec.to_sql(name='Spec', con=db.conn)
+spec.to_sql(name='Spec', con=db.conn, index=False)
 prices.to_sql(name='Prices', con=db.conn)
 
 
