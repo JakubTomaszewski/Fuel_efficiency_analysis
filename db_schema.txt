@@ -3,15 +3,14 @@ Cars
     mark_model text PRIMARY KEY,
     origin char(2)
 
-Prices
+Spec
     mark_model text PRIMARY KEY
     hp integer,
-    accel_time numeric,
-    range numeric,
-    mpg numeric,
-    weight integer);''')
+    acc_time numeric,
+    range_miles numeric,
+    mpg numeric
 
-Spec
+Prices
     date date,
     price_gallon float,
     region char(2)
