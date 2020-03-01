@@ -10,6 +10,8 @@ FUEL with fuel cost data for each year/6months (resampled)
 -get the average mileage from the web and compute which car is the most economic(which yearly cost is the smallest)
 
 -show on a plot how the fuel price changed within time
+
+-predict the future prices
 '''
 
 
@@ -30,12 +32,6 @@ import pandas as pd
 
 
 
-
-
-
-
-from sklearn.linear_model import LinearRegression
-from sklearn.linear_model import Lasso
 
 # #how the fuel price changed
 # prices['price_gallon'].plot()
