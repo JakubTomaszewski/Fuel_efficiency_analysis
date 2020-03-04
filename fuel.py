@@ -13,21 +13,44 @@ FUEL with fuel cost data for each year/6months (resampled)
 
 -predict the future prices
 '''
-
-
-# import requests
-# from bs4 import BeautifulSoup
+# # Getting the average mileage per year
+# from selenium import webdriver
 #
-# #pulling the mileage data
-# # r = requests.get('https://www.google.com/search?q=average+mileage+per+year&oq=average+&aqs=chrome.1.69i57j69i59l3j35i39j0l3.3156j0j7&sourceid=chrome&ie=UTF-8').text
-# # soup = BeautifulSoup(r, 'html.parser')
-# # soup = soup.find('div', class_="BNeawe s3v9rd AP7Wnd")
-# # print(soup)
+# driver = webdriver.Chrome()
+#
+# driver.get('https://www.google.com/search?q=average+mileage+per+year&oq=average+mile&aqs=chrome.1.69i57j69i59.3633j0j7&sourceid=chrome&ie=UTF-8')
+# avg_mileage = driver.find_element_by_xpath('//*[@id="rso"]/div[1]/div/div[1]/div/div[1]/div/div[1]/div/div[1]').text
+# print(avg_mileage)
+#
+# driver.close()
 
-import matplotlib.pyplot as plt
 import pandas as pd
+import matplotlib.pyplot
+import sqlite3
 
+class Server():
+    def __init__(self, db_name):
+        try:
+            self.conn = sqlite3.connect(db_name)
+            self.c = self.conn.cursor()
+        except sqlite3.Error:
+            print('Error while connecting to database')
 
+    def execute(self, command):
+        self.c.execute(command)
+
+    def commit(self):
+        self.conn.commit()
+
+    def close(self):
+        self.conn.close()
+
+db = Server('database.db')
+db.execute("SELECT * FROM Cars WHERE origin = 'US';")
+
+res = db.c.fetchall()
+
+[print(line) for line in res]
 
 
 

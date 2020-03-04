@@ -8,17 +8,20 @@ cars = fuel.loc[:,['name', 'origin']]
 cars = cars.set_index('name')
 spec = fuel.loc[:,['hp', 'accel', 'displ', 'mpg']].reset_index(drop=True)
 spec['model'] = fuel['name'].values
-# spec = spec.drop(['yr'], axis=1)
+spec['hp'] = spec['hp'].astype('float')
+
 car_name = fuel.name.values
-# spec = fuel.loc[:,['name', 'hp', 'accel', 'displ', 'mpg']].set_index('name')
 
 prices = prices.rename(columns={'GASREGCOVW':'price_gallon'}, errors='raise')
+
 #resampling data by 6 months
 prices = prices.resample('6M').mean()
 
 #adding a new category col with region
 prices['region'] = 'US'
 prices['region'] = prices['region'].astype('category')
+
+
 
 #creating db and a connection
 import sqlite3
@@ -48,8 +51,10 @@ db.execute('''CREATE TABLE Cars(
             origin char(2)
             );''')
 
+
+
 db.execute('''CREATE TABLE Spec(
-            hp integer,
+            hp numeric,
             acc_time numeric,
             range_miles numeric,
             mpg numeric,
@@ -57,10 +62,9 @@ db.execute('''CREATE TABLE Spec(
             );''')
 
 db.commit()
-# print(spec.head())
 
-# #inserting data into db
-# # That's a huge mess however, sqlite does not support add constraint syntax to i have to do it like this
+#inserting data into db
+# That's a huge mess however, sqlite does not support add constraint syntax to i have to do it like this
 [(db.conn.execute('INSERT INTO Cars VALUES (?, ?)', (cars.index[i], cars.iloc[i, 0]))) for i in range(len(cars))]
 [(db.conn.execute('INSERT INTO Spec VALUES (?, ?, ?, ?, ?)', (spec.iloc[i, 0], spec.iloc[i, 1], spec.iloc[i, 2], spec.iloc[i, 3], spec.iloc[i, 4]))) for i in range(len(spec))]
 
@@ -76,34 +80,25 @@ for n in car_name:
 
 db.commit()
 
-
-db.execute("SELECT name from sqlite_master WHERE type='table';")
-print(db.c.fetchall())
+# db.execute("SELECT name from sqlite_master WHERE type='table';")
+# print(db.c.fetchall())
 
 
 car = pd.read_sql_query('SELECT * FROM Cars LIMIT 5', db.conn)
 prc = pd.read_sql_query('SELECT * FROM Prices LIMIT 5', db.conn)
-spec = pd.read_sql_query('SELECT hp, acc_time FROM Spec LIMIT 5', db.conn)
+spec = pd.read_sql_query('SELECT * FROM Spec LIMIT 5', db.conn)
 
-print('CARS\n',car)
-print('PRICES\n',prc)
-print('SPEC\n',spec)
 
 # SQLite does not support the ALTER TABLE syntax so i cannot use the commands below
 # db.execute('ALTER TABLE Spec ADD CONSTRAINT spec_primary PRIMARY KEY (name);')
 # db.execute('ALTER TABLE Spec ADD CONSTRAINT car_spec_name FOREIGN KEY (name) REFERENCES Cars (mark_model) ;')
 
-db.commit()
 
-# print(spec.head())
-
-#transform it to a df using pd.read_sql_query()
-#drop all values where origin is not US
 
 db.close()
 
 
-# delete db file for testing
-import os
-
-os.system('del /f database.db')
+# # delete db file for testing
+# import os
+#
+# os.system('del /f database.db')
