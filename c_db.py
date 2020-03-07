@@ -1,21 +1,31 @@
 #importing and preparing data to be inserted
 import pandas as pd
+import numpy as np
 
-fuel = pd.read_csv('https://assets.datacamp.com/production/repositories/516/datasets/2f3d8b2156d5669fb7e12137f1c2e979c3c9ce0b/automobiles.csv', index_col='yr', parse_dates=True)
-fuel = fuel.drop_duplicates(subset=['name']) #dropping duplicate cars
-prices = pd.read_csv('GASREGCOVW.csv', index_col=0, parse_dates=True)
-cars = fuel.loc[:,['name', 'origin']]
-cars = cars.set_index('name')
-spec = fuel.loc[:,['hp', 'accel', 'displ', 'mpg']].reset_index(drop=True)
-spec['model'] = fuel['name'].values
+url_cars = 'https://assets.datacamp.com/production/repositories/516/datasets/2f3d8b2156d5669fb7e12137f1c2e979c3c9ce0b/automobiles.csv'
+url_fuel_price = 'https://fred.stlouisfed.org/graph/fredgraph.csv?bgcolor=%23e1e9f0&chart_type=line&drp=0&fo=open%20sans&graph_bgcolor=%23ffffff&height=450&mode=fred&recession_bars=on&txtcolor=%23444444&ts=12&tts=12&width=1168&nt=0&thu=0&trc=0&show_legend=yes&show_axis_titles=yes&show_tooltip=yes&id=GASREGCOVW&scale=left&cosd=1990-08-20&coed=2020-03-02&line_color=%234572a7&link_values=false&line_style=solid&mark_type=none&mw=3&lw=2&ost=-99999&oet=99999&mma=0&fml=a&fq=Weekly&fam=avg&fgst=lin&fgsnd=2009-06-01&line_index=1&transformation=lin&vintage_date=2020-03-06&revision_date=2020-03-06&nd=1990-08-20'
+
+# Fuel prices table
+prices = pd.read_csv(url_fuel_price, index_col=0, parse_dates=True)
+prices = prices.rename(columns={'GASREGCOVW':'price_gallon'}, errors='raise')
+# cleaning missing values
+prices['price_gallon'] = pd.to_numeric(prices['price_gallon'], errors='coerce')
+prices.replace('.', np.NaN, inplace=True)
+prices = prices.fillna(method='ffill')
+
+# Cars and Spec table
+car_info = pd.read_csv(url_cars, index_col='yr', parse_dates=True)
+car_info = car_info.drop_duplicates(subset=['name'])
+
+spec = car_info.loc[:,['hp', 'accel', 'displ', 'mpg']].reset_index(drop=True)
 spec['hp'] = spec['hp'].astype('float')
 
-car_name = fuel.name.values
+cars = car_info.loc[:,['name', 'origin']]
+cars = cars.set_index('name')
+cars['horse_power'] = spec['hp'].values
 
-prices = prices.rename(columns={'GASREGCOVW':'price_gallon'}, errors='raise')
-
-#resampling data by 6 months
-prices = prices.resample('6M').mean()
+#resampling data monthly
+prices = prices.resample('M').mean()
 
 #adding a new category col with region
 prices['region'] = 'US'
@@ -47,58 +57,46 @@ db = Server('database.db')
 
 #creating tables Cars, Spec
 db.execute('''CREATE TABLE Cars(
-            mark_model text PRIMARY KEY,
+            id INTEGER PRIMARY KEY,
+            mark_model text,
             origin char(2)
             );''')
 
 
 
 db.execute('''CREATE TABLE Spec(
+            car_id INTEGER PRIMARY KEY,
             hp numeric,
             acc_time numeric,
             range_miles numeric,
             mpg numeric,
-            mark_model text REFERENCES Cars(mark_model)
+            FOREIGN KEY (car_id) REFERENCES Cars (id)
             );''')
 
 db.commit()
 
+
 #inserting data into db
 # That's a huge mess however, sqlite does not support add constraint syntax to i have to do it like this
-[(db.conn.execute('INSERT INTO Cars VALUES (?, ?)', (cars.index[i], cars.iloc[i, 0]))) for i in range(len(cars))]
-[(db.conn.execute('INSERT INTO Spec VALUES (?, ?, ?, ?, ?)', (spec.iloc[i, 0], spec.iloc[i, 1], spec.iloc[i, 2], spec.iloc[i, 3], spec.iloc[i, 4]))) for i in range(len(spec))]
+[(db.conn.execute('INSERT INTO Cars VALUES (?, ?, ?);', (i, cars.index[i], cars.iloc[i, 0]))) for i in range(len(cars))]
+[(db.conn.execute('INSERT INTO Spec VALUES (?, ?, ?, ?, ?);', (i, spec.iloc[i, 0], spec.iloc[i, 1], spec.iloc[i, 2], spec.iloc[i, 3]))) for i in range(len(spec))]
 
+db.commit()
 
 # spec.to_sql(name='Spec', con=db.conn, index=False)
 prices.to_sql(name='Prices', con=db.conn)
 
+db.close()
 
-'''db.execute('ALTER TABLE Spec ADD car_name text REFERENCES Cars (mark_model);')
 
-for n in car_name:
-    db.conn.execute('INSERT INTO Spec (car_name) VALUES (?);', (n,))'''
-
-db.commit()
+'''Testing'''
 
 # db.execute("SELECT name from sqlite_master WHERE type='table';")
 # print(db.c.fetchall())
 
+# car = pd.read_sql_query('SELECT * FROM Cars LIMIT 5;', db.conn)
+# prc = pd.read_sql_query('SELECT * FROM Prices LIMIT 5;', db.conn)
+# spec = pd.read_sql_query('SELECT * FROM Spec LIMIT 5;', db.conn)
 
-car = pd.read_sql_query('SELECT * FROM Cars LIMIT 5', db.conn)
-prc = pd.read_sql_query('SELECT * FROM Prices LIMIT 5', db.conn)
-spec = pd.read_sql_query('SELECT * FROM Spec LIMIT 5', db.conn)
-
-
-# SQLite does not support the ALTER TABLE syntax so i cannot use the commands below
-# db.execute('ALTER TABLE Spec ADD CONSTRAINT spec_primary PRIMARY KEY (name);')
-# db.execute('ALTER TABLE Spec ADD CONSTRAINT car_spec_name FOREIGN KEY (name) REFERENCES Cars (mark_model) ;')
-
-
-
-db.close()
-
-
-# # delete db file for testing
-# import os
-#
-# os.system('del /f database.db')
+# db.execute("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'Spec';")
+# print(db.c.fetchall())

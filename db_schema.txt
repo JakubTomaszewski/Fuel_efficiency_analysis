@@ -1,14 +1,16 @@
 TABLES: 
 Cars
+    id INTEGER PRIMARY KEY,
     mark_model text PRIMARY KEY,
     origin char(2)
 
 Spec
-    mark_model text PRIMARY KEY
-    hp integer,
+    car_id INTEGER PRIMARY KEY,
+    hp numeric,
     acc_time numeric,
     range_miles numeric,
-    mpg numeric
+    mpg numeric,
+    FOREIGN KEY (car_id) REFERENCES Cars (id)
 
 Prices
     date date,
