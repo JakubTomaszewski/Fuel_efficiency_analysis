@@ -17,8 +17,11 @@ prices = prices.fillna(method='ffill')
 car_info = pd.read_csv(url_cars, index_col='yr', parse_dates=True)
 car_info = car_info.drop_duplicates(subset=['name'])
 
-spec = car_info.loc[:,['hp', 'accel', 'displ', 'mpg']].reset_index(drop=True)
+
+
+spec = car_info.loc[:,['hp', 'weight' ,'accel', 'displ', 'mpg']].reset_index(drop=True)
 spec['hp'] = spec['hp'].astype('float')
+spec['weight'] = spec['weight'].astype('float')
 
 cars = car_info.loc[:,['name', 'origin']]
 cars = cars.set_index('name')
@@ -67,6 +70,7 @@ db.execute('''CREATE TABLE Cars(
 db.execute('''CREATE TABLE Spec(
             car_id INTEGER PRIMARY KEY,
             hp numeric,
+            weight numeric,
             acc_time numeric,
             range_miles numeric,
             mpg numeric,
@@ -79,7 +83,8 @@ db.commit()
 #inserting data into db
 # That's a huge mess however, sqlite does not support add constraint syntax to i have to do it like this
 [(db.conn.execute('INSERT INTO Cars VALUES (?, ?, ?);', (i, cars.index[i], cars.iloc[i, 0]))) for i in range(len(cars))]
-[(db.conn.execute('INSERT INTO Spec VALUES (?, ?, ?, ?, ?);', (i, spec.iloc[i, 0], spec.iloc[i, 1], spec.iloc[i, 2], spec.iloc[i, 3]))) for i in range(len(spec))]
+for i in range(len(spec)):
+    db.conn.execute('INSERT INTO Spec VALUES (?, ?, ?, ?, ?, ?);', (i, spec.iloc[i, 0], spec.iloc[i, 1], spec.iloc[i, 2], spec.iloc[i, 3], spec.iloc[i, 3]))
 
 db.commit()
 
@@ -97,6 +102,7 @@ db.close()
 # car = pd.read_sql_query('SELECT * FROM Cars LIMIT 5;', db.conn)
 # prc = pd.read_sql_query('SELECT * FROM Prices LIMIT 5;', db.conn)
 # spec = pd.read_sql_query('SELECT * FROM Spec LIMIT 5;', db.conn)
+
 
 # db.execute("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'Spec';")
 # print(db.c.fetchall())
