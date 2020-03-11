@@ -1,4 +1,6 @@
 # Fuel analysis
 
-#### SQLite
-#### scikit-learn (LinearRegression, Lasso)
+- SQLite
+- scikit-learn (RandomForestRegressor)
+- XGBoost
+- Feature importances (eli5)
