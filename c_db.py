@@ -84,7 +84,7 @@ db.commit()
 # That's a huge mess however, sqlite does not support add constraint syntax to i have to do it like this
 [(db.conn.execute('INSERT INTO Cars VALUES (?, ?, ?);', (i, cars.index[i], cars.iloc[i, 0]))) for i in range(len(cars))]
 for i in range(len(spec)):
-    db.conn.execute('INSERT INTO Spec VALUES (?, ?, ?, ?, ?, ?);', (i, spec.iloc[i, 0], spec.iloc[i, 1], spec.iloc[i, 2], spec.iloc[i, 3], spec.iloc[i, 3]))
+    db.conn.execute('INSERT INTO Spec VALUES (?, ?, ?, ?, ?, ?);', (i, spec.iloc[i, 0], spec.iloc[i, 1], spec.iloc[i, 2], spec.iloc[i, 3], spec.iloc[i, 4]))
 
 db.commit()
 
@@ -102,7 +102,6 @@ db.close()
 # car = pd.read_sql_query('SELECT * FROM Cars LIMIT 5;', db.conn)
 # prc = pd.read_sql_query('SELECT * FROM Prices LIMIT 5;', db.conn)
 # spec = pd.read_sql_query('SELECT * FROM Spec LIMIT 5;', db.conn)
-
 
 # db.execute("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'Spec';")
 # print(db.c.fetchall())
